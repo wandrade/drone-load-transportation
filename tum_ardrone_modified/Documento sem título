@@ -1,0 +1,2 @@
+make cfg executable
+chmod a+x your_package/cfg/MyStuff.cfg
