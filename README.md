@@ -40,10 +40,17 @@ Then build your workspace again.
 cd catkin_ws
 catkin_make
 ```
-
+If you get errors of undeclared variables or some unespected problem, try to erase all built files and then recompile everything
+``` bash
+cd catkin_ws/build
+rm -r
+cd ..
+catkin_make clean
+catkin_make
+```
 ###Quick Start
-
-Connect your AR.Drone battery and, in separate terminals, launch the nodes:
+First, you need to prepare your drone, for that print the tag (that came with this repository) in a 5x5cm size, cut a piece of fishing line or some other very thin and discrete line of abaout 1.20m, glue the tag on a piece of cardboard and pass the line rigth in the middle of it, só when you hold it by the line, the tag stays leveld and finally use a piece of duct tape to glue it on the lowe part of the drone.
+Connect your AR.Drone battery, turn on your wifi, connect to the drone's network and, in separate terminals, launch the nodes:
 
 - ardrone_driver: this may take a few seconds to build. Check the prompt messages for connection failures. The AR.Drone will best perform with full charge.
 ``` bash
