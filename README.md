@@ -49,7 +49,9 @@ catkin_make clean
 catkin_make
 ```
 ###Quick Start
+
 First, you need to prepare your drone, for that print the tag (that came with this repository) in a 5x5cm size, cut a piece of fishing line or some other very thin and discrete line of abaout 1.20m, glue the tag on a piece of cardboard and pass the line rigth in the middle of it, só when you hold it by the line, the tag stays leveld and finally use a piece of duct tape to glue it on the lowe part of the drone.
+
 Connect your AR.Drone battery, turn on your wifi, connect to the drone's network and, in separate terminals, launch the nodes:
 
 - ardrone_driver: this may take a few seconds to build. Check the prompt messages for connection failures. The AR.Drone will best perform with full charge.
@@ -57,7 +59,7 @@ Connect your AR.Drone battery, turn on your wifi, connect to the drone's network
 cd catkin_ws/src
 export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:`pwd`/ardrone_autonomy
 rosmake ardrone_autonomy
-roslaunch ardrone_autonomy ardrone_driver.launch
+roslaunch ardrone_autonomy ardrone.launch
 ```
 - ar_pose: this node will perform the marker pose estimation (assuming you already attached the marker to the suspended load)
 ``` bash
@@ -102,6 +104,16 @@ In order to enable the load stabilization controller, select the node [drone_aut
 ![UseLoadConfig](https://cloud.githubusercontent.com/assets/9382891/5175752/12f73fea-7426-11e4-89cc-1a1ac70605e5.png)
 
 Open the [drone_gui](http://wiki.ros.org/tum_ardrone/drone_gui#Keyboard_Control) interface, click on "Toggle Cam". Now you should see the bottom image on the rviz screen.
+
+If you see an error on the rviz UI about the camera image, tou shuld try to calibrate both cameras of the ardrone and generate a .yaml file.
+
+Install the camera calibration and follow the instructions on the link bellow
+``` bash
+rosdep install camera_calibration
+```
+http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration
+
+Save the files with the names 'ardrone_bottom.yaml' and 'ardrone_front.yaml' after converting it to yaml as shown in the tutorial, at the /home/[username]/.ros/camera_info/ and try running all programs again.
 
 ![rviz_screen](https://cloud.githubusercontent.com/assets/9382891/5175742/0266cdf8-7426-11e4-966a-8efcbdc31c14.png)
 
