@@ -29,11 +29,12 @@ After download, unzip the files into the source folder of your workspace and exe
 cd catkin_ws/src/<package name>
 rosdep install <package name>
 ```
-Build your workspace.
+Redo it for all packages and then build your workspace.
 ``` bash
+cd ~/catkin_ws
 catkin_make
 ```
-Download all the files in this repository [drone-load-transportation](), look into the original packages and replace the existing files with these ones (look for the same file name). Make sure to have a backup of the original files, in case something goes wrong.
+Download all the files in this repository [drone-load-transportation](), look into the original packages and replace the existing files with these ones (search for the same file name). Make sure to have a backup of the original files, in case something goes wrong.
 
 Then build your workspace again.
 ``` bash
@@ -86,6 +87,14 @@ rosrun rqt_graph rqt_graph
 
 ![envio_tf](https://cloud.githubusercontent.com/assets/9382891/5175632/c8205962-7424-11e4-894b-19378d03720d.png)
 
+After the first time, all tou should need to do to run the whole system are the following commnads, one in each command line window:
+``` bash
+roslaunch ardrone_autonomy ardrone.launch
+roslaunch ar_pose ar_pose_single.launch
+roslaunch tum_ardrone tum_ardrone.launch
+```
+First to connect to the drone, then open image proc. and tag detection and finally to move the drone around.
+
 ###Flying
 
 AR.Drone 2.0 does not allow streaming of both camera images simultaneously, which means that for the load transportation porpuse it is necessary to give up the PTAM functionality. The Drone will still be able to fly autonomously, but its pose estimation will be worse. Let's hope that Parrot changes that in the future. 
@@ -97,7 +106,7 @@ rosrun rqt_reconfigure rqt_reconfigure
 This will open the [rqt_reconfigure](http://wiki.ros.org/dynamic_reconfigure) screen, which allows the user to dynamically configure node parameters without having to access the source code or stop running it.
 > IMPORTANT: requires the node drone_stateestimation to be running.
 
-Select the node [drone_stateestimation](http://wiki.ros.org/tum_ardrone/drone_stateestimation) and uncheck "Use PTAM". For further experiments, you can also uncheck "Use navdata", which will make the EKF use only the control gains to update.
+Select the node [drone_stateestimation](http://wiki.ros.org/tum_ardrone/drone_stateestimation) and uncheck "Use PTAM". For further experiments.
 
 In order to enable the load stabilization controller, select the node [drone_autopilot](http://wiki.ros.org/tum_ardrone/drone_autopilot) and check "Use Load Control". The controller parameters are set for a suspended load with approximately 10% of the Drone's weight, but feel free to experiment.
 
@@ -105,15 +114,9 @@ In order to enable the load stabilization controller, select the node [drone_aut
 
 Open the [drone_gui](http://wiki.ros.org/tum_ardrone/drone_gui#Keyboard_Control) interface, click on "Toggle Cam". Now you should see the bottom image on the rviz screen.
 
-If you see an error on the rviz UI about the camera image, tou shuld try to calibrate both cameras of the ardrone and generate a .yaml file.
 
-Install the camera calibration and follow the instructions on the link bellow
-``` bash
-rosdep install camera_calibration
-```
-http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration
 
-Save the files with the names 'ardrone_bottom.yaml' and 'ardrone_front.yaml' after converting it to yaml as shown in the tutorial, at the /home/[username]/.ros/camera_info/ and try running all programs again.
+If you see an error on the rviz UI about the camera image, tou shuld try to calibrate both cameras of the ardrone and generate a .yaml file (the steps are listed at the end of this page).
 
 ![rviz_screen](https://cloud.githubusercontent.com/assets/9382891/5175742/0266cdf8-7426-11e4-966a-8efcbdc31c14.png)
 
@@ -160,4 +163,38 @@ In order to take the recorded date to other softwares, it is useful to convert t
 ``` bash
 rostopic echo -b subset.bag -p /ardrone/navdata > output.txt
 ```
+
+####Adjusting PID controler
+First adjust the PID controler for the drone without the load, for that run in 3 separate terminals:
+
+``` bash
+roslaunch ardrone_autonomy ardrone.launch
+roslaunch tum_ardrone tum_ardrone.launch
+rosrun rqt_reconfigure rqt_reconfigure
+```
+At the rqt_reconfigure window, uncheck the options UsePTAM and UseLoadControl.
+We will have to set the PID controler one by one, so set all the gains (Ki_x, Kp_x, Kd_x where X may be rp for roll an pith, yaw for yaw, and gaz for z) to zero.
+In this example, we will adjust the PID controller for de yaw(z rotation) of the drone, later you should repeat the process for rp, gaz and load as well.
+ 
+To monitor the variable we want to control, run in other 2 separate terminals:
+``` bash
+rqt_plot /ardrone/pdictedPose/yaw:x:y:z
+rostopic echo /ardrone/predictedPose/yaw
+```
+The plot is only for visual reference, we will be looking at the rostopich echo for a reference.
+
+Arrange the 4 windows (tum_ardrone GUI, rostopic echo terminal, plot and rqt_reconfigure), in a way that you can see the plot and the numbers for our target variable, send writen commands trough GUI and click on emergency button, and hav access to the 3 variables on rqt_reconfigure (ki, kp and kd). In my case i used a transparent terminal, used half the sceen for the plot and terminal, and the other half split in 2 for the rqt_reconfigure and GUI as shown:
+
+Put the drone in a open space with no wind and far from other objects, then proceed with the commando goto 0 0 0 yaw_value, and ajust the Ki, Kp and Kd gains until you've reched a good combination using your prefered method.
+
+
+###Camera calibrating
+
+Install the camera calibration and follow the instructions on the link bellow
+``` bash
+rosdep install camera_calibration
+```
+http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration
+
+Save the files with the names 'ardrone_bottom.yaml' and 'ardrone_front.yaml' after converting it to yaml as shown in the tutorial, at the /home/[username]/.ros/camera_info/ and try running all programs again.
 
