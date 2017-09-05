@@ -5,7 +5,12 @@ drone-load-transportation
 ![camera_carga](https://cloud.githubusercontent.com/assets/9382891/5175796/cfcbd64e-7426-11e4-8bfd-dadac481f86e.png)
 
 ###Installation (with catkin)
+Install external dependencies:
 
+``` bash
+sudo apt-get install libv4l-dev
+sudo apt-get install qtcreator libgl1-mesa-dev
+```
 Download the original packages from:
 
 - ardrone_autonomy: https://github.com/tum-vision/ardrone_autonomy
@@ -29,14 +34,16 @@ After download, unzip the files into the source folder of your workspace and exe
 cd catkin_ws/src/<package name>
 rosdep install <package name>
 ```
-Redo it for all packages and then build your workspace.
-``` bash
-cd ~/catkin_ws
-catkin_make
-```
+Redo it for all packages.
+
 Download all the files in this repository [drone-load-transportation](), look into the original packages and replace the existing files with these ones (search for the same file name). Make sure to have a backup of the original files, in case something goes wrong.
 
-Then build your workspace again.
+for the AutopilotPArams.cfg file, run the following commands after replacing it with the original
+``` bash
+chom a+x your_package/cfg/AutopilotParams.cfg
+```
+
+Then build your workspace.
 ``` bash
 cd catkin_ws
 catkin_make
@@ -62,6 +69,8 @@ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:`pwd`/ardrone_autonomy
 rosmake ardrone_autonomy
 roslaunch ardrone_autonomy ardrone.launch
 ```
+If you experience some kind of conflict error, choose one of the two .launch files listed.
+
 - ar_pose: this node will perform the marker pose estimation (assuming you already attached the marker to the suspended load)
 ``` bash
 cd catkin_ws/src
@@ -70,6 +79,7 @@ rosmake ar_pose
 rosmake rviz rosbag
 roslaunch ar_pose ar_pose_single.launch
 ```
+
 The [rviz](http://ros.org/wiki/rviz) window should pop on the screen, but you will not see the image until the Drone's bottom camera streaming is enabled (later).
 
 - tum_ardrone: this will launch three nodes. Do not proceed without checking [tum_ardrone](https://github.com/tum-vision/tum_ardrone/tree/indigo-devel) for information about the nodes functionalities.
